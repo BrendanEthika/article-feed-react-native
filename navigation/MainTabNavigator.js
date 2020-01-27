@@ -5,7 +5,8 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
+import HomeFeedScreen from '../screens/HomeFeedScreen';
+import HomeFeedItemScreen from "../screens/HomeFeedItemScreen";
 import SettingsScreen from '../screens/SettingsScreen';
 
 const config = Platform.select({
@@ -13,21 +14,29 @@ const config = Platform.select({
   default: {},
 });
 
-const LinksStack = createStackNavigator(
+
+
+
+const HomeFeedStack = createStackNavigator(
   {
-    Links: LinksScreen,
+    HomeFeed: {
+      screen: HomeFeedScreen,
+      path: 'home-feed',
+    },
+    HomeFeedItem: {
+      screen: HomeFeedItemScreen,
+      path: 'home-feed/:id',
+    }
   },
   config
 );
 
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
+HomeFeedStack.navigationOptions = {
+  tabBarLabel: 'Home Feed List',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />
   ),
 };
-
-LinksStack.path = '';
 
 const HomeStack = createStackNavigator(
   {
@@ -69,7 +78,7 @@ SettingsStack.navigationOptions = {
 SettingsStack.path = '';
 
 const tabNavigator = createBottomTabNavigator({
-  LinksStack,
+  HomeFeedStack,
   HomeStack,
   SettingsStack,
 });
