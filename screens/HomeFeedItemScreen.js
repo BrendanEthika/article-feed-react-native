@@ -1,7 +1,18 @@
 import React from 'react';
-import {Text, SafeAreaView, StyleSheet, View, Image, ScrollView} from 'react-native';
+import {Text, SafeAreaView, StyleSheet, View, Image, ScrollView, FlatList, Dimensions} from 'react-native';
 import { RaleText700 } from '../components/StyledText';
 import Moment from 'moment';
+import HTML from 'react-native-render-html';
+
+const IMAGES_MAX_WIDTH = Dimensions.get('window').width - 50;
+const CUSTOM_STYLES = {};
+const CUSTOM_RENDERERS = {};
+const DEFAULT_PROPS = {
+  htmlStyles: CUSTOM_STYLES,
+  renderers: CUSTOM_RENDERERS,
+  imagesMaxWidth: IMAGES_MAX_WIDTH,
+  debug: true
+};
 
 export default class HomeFeedItemScreen extends React.Component {
   render() {
@@ -14,11 +25,13 @@ export default class HomeFeedItemScreen extends React.Component {
       headline_component: {
         viewport: [
           {
-            url:'https://media.ethika.com/site-media/homefeed/SwollIMG_4586-copy.jpg'
+            url:'https://media.ethika.com/site-media/news/BlogReclaimed_01.jpg?cachebust=201&auto=format,compress'
           }
         ]
-      }
+      },
+      detail_components: []
     });
+
 
     console.log(0, `https://media.ethika.com${homeFeedItem.headline_component.viewport[0].url}`);
 
@@ -37,6 +50,13 @@ export default class HomeFeedItemScreen extends React.Component {
             {Moment(homeFeedItem.publish_date).format('MMM d, YYYY     hh:mm A').toUpperCase()}
           </RaleText700>
         </View>
+        <FlatList
+          data={homeFeedItem.detail_components}
+          keyExtractor={detailItem => detailItem._id}
+          renderItem={({item}) => (
+            <View>{this.displayDetailComponent(item)}</View>
+          )}
+        />
         <View>
           <Text>
             Data:{JSON.stringify(homeFeedItem)}
@@ -45,6 +65,20 @@ export default class HomeFeedItemScreen extends React.Component {
       </ScrollView>
     );
   }
+
+  displayDetailComponent(componentItem) {
+    if(componentItem.type === 'ARTICLE') {
+      return <View>
+        <Text> Type: AWSOME ARTICLE </Text>
+        <HTML
+        {...DEFAULT_PROPS}
+        html={componentItem.content}
+      />
+      </View>;
+    } else {
+      return <Text> Type: { componentItem.type } </Text>;
+    }
+  };
 }
 
 HomeFeedItemScreen.navigationOptions = ({ navigation }) => {
