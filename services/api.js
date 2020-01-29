@@ -6,7 +6,8 @@ YellowBox.ignoreWarnings([
 ])
 
 const api = axios.create({
-    baseURL: 'https://api.etk-dev.com/app-api/'
+    // baseURL: 'https://api.etk-dev.com/app-api/'
+  baseURL: 'http://api.ethika.node:3010/app-api/'
 })
 
 export default api;

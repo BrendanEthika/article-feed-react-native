@@ -4,12 +4,12 @@ import { FlatList, StyleSheet, Image, Text, View } from 'react-native';
 import Touchable from 'react-native-platform-touchable';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
-import { NavigationActions } from 'react-navigation';
 // import io from 'socket.io-client'
 
 export default class HomeFeedList extends React.Component {
   state = {
     feed: [],
+    response: false,
   };
 
   async componentDidMount() {
@@ -39,7 +39,6 @@ export default class HomeFeedList extends React.Component {
                     homeFeed: item,
                   }
                 });
-                console.log(1, navigation);
               }}>
               <View style={{ flexDirection: 'row' }}>
                 <View style={styles.optionIconContainer}>

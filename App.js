@@ -41,6 +41,8 @@ async function loadResourcesAsync() {
       // remove this if you are not using it in your app
       'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
       'Raleway': require('./assets/fonts/raleway-v12-latin/raleway-v12-latin-regular.ttf'),
+      'Raleway700': require('./assets/fonts/raleway-v12-latin/raleway-v12-latin-700.ttf'),
+      'Raleway900': require('./assets/fonts/raleway-v12-latin/raleway-v12-latin-900.ttf'),
     }),
   ]);
 }
