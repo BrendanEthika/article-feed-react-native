@@ -1,6 +1,6 @@
 import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { FlatList, StyleSheet, Image, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Image, Text, View, RefreshControl, ScrollView } from 'react-native';
 import Touchable from 'react-native-platform-touchable';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
@@ -10,6 +10,8 @@ export default class HomeFeedList extends React.Component {
   state = {
     feed: [],
     response: false,
+    refreshing: false,
+    setRefreshing: false
   };
 
   async componentDidMount() {
@@ -18,40 +20,45 @@ export default class HomeFeedList extends React.Component {
   };
 
 
-
-
   render() {
     const { navigation } = this.props;
     return (
+      <ScrollView
+        contentContainerStyle={{flex: 1}}
+        refreshControl={
+          <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
+        }
+      >
         <FlatList
           data={this.state.feed}
           keyExtractor={feedItem => feedItem._id}
           renderItem={({item}) => (
             <View>
-            <Touchable
-              style={styles.option}
-              background={Touchable.Ripple('#ccc', false)}
-              onPress={() => {
-                navigation.navigate({
-                  routeName: 'HomeFeedItem',
-                  params: {
-                    id: item._id,
-                    homeFeed: item,
-                  }
-                });
-              }}>
-              <View style={{ flexDirection: 'row' }}>
-                <View style={styles.optionIconContainer}>
-                  <Ionicons name="ios-chatboxes" size={22} color="#ccc" />
+              <Touchable
+                style={styles.option}
+                background={Touchable.Ripple('#ccc', false)}
+                onPress={() => {
+                  navigation.navigate({
+                    routeName: 'HomeFeedItem',
+                    params: {
+                      id: item._id,
+                      homeFeed: item,
+                    }
+                  });
+                }}>
+                <View style={{ flexDirection: 'row' }}>
+                  <View style={styles.optionIconContainer}>
+                    <Ionicons name="ios-chatboxes" size={22} color="#ccc" />
+                  </View>
+                  <View style={styles.optionTextContainer}>
+                    <Text style={styles.optionText}>{item.title}</Text>
+                  </View>
                 </View>
-                <View style={styles.optionTextContainer}>
-                  <Text style={styles.optionText}>{item.title}</Text>
-                </View>
-              </View>
-            </Touchable>
+              </Touchable>
             </View>
-            )}
+          )}
         />
+      </ScrollView>
     );
   }
 
@@ -61,6 +68,11 @@ export default class HomeFeedList extends React.Component {
 
   _handlePressForums = () => {
     WebBrowser.openBrowserAsync('https://api.etk-dev.com/api-docs/#/Home%20Feed/get_app_api_home_feed_');
+  };
+
+  onRefresh = () => {
+    this.setState({setRefreshing: true});
+    this.componentDidMount();
   };
 }
 

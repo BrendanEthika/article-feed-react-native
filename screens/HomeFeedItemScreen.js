@@ -1,8 +1,9 @@
 import React from 'react';
-import {Text, SafeAreaView, StyleSheet, View, Image, ScrollView, FlatList, Dimensions} from 'react-native';
+import {Text, SafeAreaView, StyleSheet, View, Image, ScrollView, FlatList, Dimensions, Linking, TouchableOpacity} from 'react-native';
 import { RaleText700 } from '../components/StyledText';
 import Moment from 'moment';
 import HTML from 'react-native-render-html';
+import * as WebBrowser from "expo-web-browser";
 
 const IMAGES_MAX_WIDTH = Dimensions.get('window').width - 50;
 const CUSTOM_STYLES = {};
@@ -11,6 +12,14 @@ const DEFAULT_PROPS = {
   htmlStyles: CUSTOM_STYLES,
   renderers: CUSTOM_RENDERERS,
   imagesMaxWidth: IMAGES_MAX_WIDTH,
+  onLinkPress: (evt, href) => {
+    //To open within app use WebBrowser
+    //To open in safari use Linking
+    Linking.openURL(href);
+    // WebBrowser.openBrowserAsync(
+    //   href
+    // );
+  },
   debug: true
 };
 
@@ -32,9 +41,6 @@ export default class HomeFeedItemScreen extends React.Component {
       detail_components: []
     });
 
-
-    console.log(0, `https://media.ethika.com${homeFeedItem.headline_component.viewport[0].url}`);
-
     return (
       <ScrollView style={styles.container}>
         <View style={styles.feedHeadlineImageHeader}>
@@ -52,6 +58,7 @@ export default class HomeFeedItemScreen extends React.Component {
         </View>
         <FlatList
           data={homeFeedItem.detail_components}
+          style={styles.feedDetailComponentList}
           keyExtractor={detailItem => detailItem._id}
           renderItem={({item}) => (
             <View>{this.displayDetailComponent(item)}</View>
@@ -69,15 +76,31 @@ export default class HomeFeedItemScreen extends React.Component {
   displayDetailComponent(componentItem) {
     if(componentItem.type === 'ARTICLE') {
       return <View>
-        <Text> Type: AWSOME ARTICLE </Text>
+        <Text> Type: ARTICLE Render </Text>
         <HTML
         {...DEFAULT_PROPS}
         html={componentItem.content}
       />
       </View>;
+    } else if(componentItem.type === 'PRODUCT') {
+      return <View>
+        <Text> Type: PRODUCT Link </Text>
+        <TouchableOpacity activeOpacity = { .5 } onPress={() => {this.openProductPage(componentItem.product_id)}}>
+          <Image style={{width: '100%', height: 250}} resizeMode={'contain'} source={{uri: `https://media.ethika.com/${componentItem._product.cart_image_url}`}} />
+        </TouchableOpacity>
+      </View>;
     } else {
-      return <Text> Type: { componentItem.type } </Text>;
+      return <View>
+        <Text>
+        Type: { componentItem.type }
+        Data:{JSON.stringify(componentItem)}
+        </Text>
+      </View>;
     }
+  };
+
+  openProductPage = (product_id) => {
+    WebBrowser.openBrowserAsync(`https://www.ethika.com/s/${product_id}`);
   };
 }
 
@@ -132,5 +155,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#000'
+  },
+  feedDetailComponentList: {
+    borderBottomColor: 'lightgray',
+    borderBottomWidth: 1,
+    paddingBottom: 10,
+    marginBottom:5
   },
 });
