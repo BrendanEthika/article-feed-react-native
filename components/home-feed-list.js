@@ -14,14 +14,11 @@ import {
 } from 'react-native';
 import Touchable from 'react-native-platform-touchable';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  SharedElement,
-  SharedElementTransition,
-  nodeFromRef
-} from 'react-native-shared-element';
 import EStyleSheet from "react-native-extended-stylesheet";
 // import io from 'socket.io-client'
 import api from '../services/api';
+import { SharedElement } from 'react-navigation-shared-element';
+import TouchableScale from 'react-native-touchable-scale';
 
 export default class HomeFeedList extends React.Component {
   state = {
@@ -35,7 +32,6 @@ export default class HomeFeedList extends React.Component {
     const response = await api.get('home-feed');
     this.setState({feed: response.data.data.homeFeeds})
   };
-
 
   render() {
     const { navigation } = this.props;
@@ -51,29 +47,18 @@ export default class HomeFeedList extends React.Component {
           <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
         }
       >
-        <View style={StyleSheet.absoluteFill}>
-          <SharedElementTransition
-            start={{
-              node: startNode,
-              ancestor: startAncestor
-            }}
-            end={{
-              node: endNode,
-              ancestor: endAncestor
-            }}
-            position={position}
-            animation='move'
-            resize='auto'
-            align='auto'
-          />
-        </View>
         <FlatList
           data={this.state.feed}
           keyExtractor={feedItem => feedItem._id}
           renderItem={({item}) => (
             <View>
-              <Touchable
+              <TouchableScale
                 background={Touchable.Ripple('#ccc', false)}
+                style={styles.touchFlex}
+                activeScale={0.9}
+                tension={50}
+                friction={7}
+                useNativeDriver
                 onPress={() => {
                   navigation.navigate({
                     routeName: 'HomeFeedItem',
@@ -90,19 +75,20 @@ export default class HomeFeedList extends React.Component {
                 }}>
                 <View
                   style={styles.feedItemContainer}
-                  ref={ref => startAncestor = nodeFromRef(ref)}
                 >
                   <View style={styles.feedItemDisplay}>
                     <View style={styles.feedItemHeader}>
                       <Ionicons name="ios-chatboxes" size={22} color="#ccc" />
                       <Text style={styles.optionText}>{item.title}</Text>
                     </View>
-                    <SharedElement onNode={node => startNode = node}>
+                    <View style={styles.touchContainer}>
+                    <SharedElement id={`item.${item._id}.photo`}>
                       { this.displayFeedImage(item) }
                     </SharedElement>
+                    </View>
                   </View>
                 </View>
-              </Touchable>
+              </TouchableScale>
             </View>
           )}
         />
@@ -184,5 +170,11 @@ const styles = EStyleSheet.create({
     width: '100%',
     height: 250,
     marginVertical: 15
+  },
+  touchFlex: {
+    flex: 1,
+  },
+  touchContainer: {
+    flex: 1
   },
 });

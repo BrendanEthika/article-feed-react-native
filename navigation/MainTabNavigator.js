@@ -2,6 +2,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
@@ -17,7 +18,8 @@ const config = Platform.select({
 
 
 
-const HomeFeedStack = createStackNavigator(
+const HomeFeedStack = createSharedElementStackNavigator(
+  createStackNavigator,
   {
 
     HomeFeed: {

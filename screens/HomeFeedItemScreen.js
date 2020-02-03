@@ -17,12 +17,7 @@ import Moment from 'moment';
 import HTML from 'react-native-render-html';
 import * as WebBrowser from "expo-web-browser";
 import EStyleSheet from 'react-native-extended-stylesheet';
-import {
-  SharedElement,
-  SharedElementTransition,
-  nodeFromRef
-} from 'react-native-shared-element';
-
+import { SharedElement } from 'react-navigation-shared-element';
 
 const IMAGES_MAX_WIDTH = Dimensions.get('window').width - 50;
 const CUSTOM_STYLES = {};
@@ -42,8 +37,15 @@ const DEFAULT_PROPS = {
   debug: true
 };
 
-
 export default class HomeFeedItemScreen extends React.Component {
+
+  static sharedElements = (navigation, otherNavigation, showing) => {
+    // Transition element `item.${item.id}.photo` when either
+    // showing or hiding this screen (coming from any route)
+    const item = navigation.getParam('homeFeed');
+    return [`item.${item._id}.photo`];
+  }
+
   render() {
     Moment.locale('en');
     const { navigation } = this.props;
@@ -68,27 +70,11 @@ export default class HomeFeedItemScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container}>
-        <View style={StyleSheet.absoluteFill}>
-          <SharedElementTransition
-            start={{
-              node: startNode,
-              ancestor: startAncestor
-            }}
-            end={{
-              node: endNode,
-              ancestor: endAncestor
-            }}
-            position={position}
-            animation='move'
-            resize='auto'
-            align='auto'
-          />
-        </View>
         <View
           style={styles.feedImageHeader}
-          ref={ref => endAncestor = nodeFromRef(ref)}
         >
-          <SharedElement onNode={node => endNode = node}>
+          <SharedElement
+            id={`item.${homeFeedItem._id}.photo`}>
             {this.displayFeedImage(homeFeedItem)}
           </SharedElement>
         </View>
@@ -127,6 +113,7 @@ export default class HomeFeedItemScreen extends React.Component {
       source={
         {uri: imageSource}
       }
+      resizeMode="cover"
       style={styles.feedImage}
     />
   };
