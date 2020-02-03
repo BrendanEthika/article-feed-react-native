@@ -51,7 +51,7 @@ export default class HomeFeedItemScreen extends React.Component {
     let startNode = navigation.getParam('startNode', {});
     let endAncestor = navigation.getParam('endAncestor', {});
     let endNode = navigation.getParam('endNode', {});
-    const position = new Animated.Value(0);
+    const position = navigation.getParam('position', new Animated.Value(0));
     const homeFeedID = navigation.getParam('id', 'NO-ID');
     const homeFeedItem = navigation.getParam('homeFeed', {
       title: '',
@@ -85,7 +85,7 @@ export default class HomeFeedItemScreen extends React.Component {
           />
         </View>
         <View
-          style={styles.feedItemHeader}
+          style={styles.feedImageHeader}
           ref={ref => endAncestor = nodeFromRef(ref)}
         >
           <SharedElement onNode={node => endNode = node}>
@@ -214,21 +214,23 @@ const styles = EStyleSheet.create({
     marginBottom:5
   },
   feedItemContainer: {
-    marginTop: 20,
-    flexDirection: 'row',
     width: '100%',
-  },
-  feedItem: {
     borderBottomColor: 'lightgray',
     borderBottomWidth: 1,
     marginBottom:5
   },
-  'feedItem:last-child': {
+  'feedItemContainer:last-child': {
     borderBottomWidth: 0,
     marginBottom:0
   },
   feedImage: {
     width: '100%',
     height: 300
+  },
+  feedImageHeader: {
+    marginTop:0,
+    width: '100%',
+    borderBottomColor: 'lightgray',
+    borderBottomWidth: 1,
   },
 });

@@ -83,7 +83,8 @@ export default class HomeFeedList extends React.Component {
                       startAncestor: startAncestor,
                       startNode: startNode,
                       endAncestor: endAncestor,
-                      endNode: endNode
+                      endNode: endNode,
+                      position: position
                     }
                   });
                 }}>
