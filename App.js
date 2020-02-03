@@ -4,11 +4,15 @@ import * as Font from 'expo-font';
 import React, { useState } from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import EStyleSheet from 'react-native-extended-stylesheet';
 import AppNavigator from './navigation/AppNavigator';
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
+
+  EStyleSheet.build({ // always call EStyleSheet.build() even if you don't use global variables!
+    $textColor: '#0275d8'
+  });
 
   if (!isLoadingComplete && !props.skipLoadingScreen) {
     return (

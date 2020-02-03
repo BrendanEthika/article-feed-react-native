@@ -1,9 +1,28 @@
 import React from 'react';
-import {Text, SafeAreaView, StyleSheet, View, Image, ScrollView, FlatList, Dimensions, Linking, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  SafeAreaView,
+  Animated,
+  View,
+  Image,
+  ScrollView,
+  FlatList,
+  Dimensions,
+  Linking,
+  TouchableOpacity,
+  StyleSheet
+} from 'react-native';
 import { RaleText700 } from '../components/StyledText';
 import Moment from 'moment';
 import HTML from 'react-native-render-html';
 import * as WebBrowser from "expo-web-browser";
+import EStyleSheet from 'react-native-extended-stylesheet';
+import {
+  SharedElement,
+  SharedElementTransition,
+  nodeFromRef
+} from 'react-native-shared-element';
+
 
 const IMAGES_MAX_WIDTH = Dimensions.get('window').width - 50;
 const CUSTOM_STYLES = {};
@@ -23,10 +42,16 @@ const DEFAULT_PROPS = {
   debug: true
 };
 
+
 export default class HomeFeedItemScreen extends React.Component {
   render() {
     Moment.locale('en');
     const { navigation } = this.props;
+    let startAncestor = navigation.getParam('startAncestor', {});
+    let startNode = navigation.getParam('startNode', {});
+    let endAncestor = navigation.getParam('endAncestor', {});
+    let endNode = navigation.getParam('endNode', {});
+    const position = new Animated.Value(0);
     const homeFeedID = navigation.getParam('id', 'NO-ID');
     const homeFeedItem = navigation.getParam('homeFeed', {
       title: '',
@@ -43,8 +68,29 @@ export default class HomeFeedItemScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container}>
-        <View style={styles.feedHeadlineImageHeader}>
-          <Image source={{uri: 'https://media.ethika.com/site-media/homefeed/SwollIMG_4586-copy.jpg'}} style={styles.hf_headline_image} />
+        <View style={StyleSheet.absoluteFill}>
+          <SharedElementTransition
+            start={{
+              node: startNode,
+              ancestor: startAncestor
+            }}
+            end={{
+              node: endNode,
+              ancestor: endAncestor
+            }}
+            position={position}
+            animation='move'
+            resize='auto'
+            align='auto'
+          />
+        </View>
+        <View
+          style={styles.feedItemHeader}
+          ref={ref => endAncestor = nodeFromRef(ref)}
+        >
+          <SharedElement onNode={node => endNode = node}>
+            {this.displayFeedImage(homeFeedItem)}
+          </SharedElement>
         </View>
         <View style={styles.feedItemHeader}>
           <RaleText700 style={styles.hf_h1}>
@@ -61,7 +107,9 @@ export default class HomeFeedItemScreen extends React.Component {
           style={styles.feedDetailComponentList}
           keyExtractor={detailItem => detailItem._id}
           renderItem={({item}) => (
-            <View>{this.displayDetailComponent(item)}</View>
+            <View style={styles.feedItemContainer}>
+              {this.displayDetailComponent(item)}
+            </View>
           )}
         />
         <View>
@@ -72,6 +120,16 @@ export default class HomeFeedItemScreen extends React.Component {
       </ScrollView>
     );
   }
+
+  displayFeedImage(item) {
+    const imageSource = `https://media.ethika.com/${item.headline_component && item.headline_component.viewport && item.headline_component.viewport[0].url ? item.headline_component.viewport[0].url : 'site-media/news/BlogReclaimed_01.jpg?cachebust=201&auto=format,compress'}`;
+    return <Image
+      source={
+        {uri: imageSource}
+      }
+      style={styles.feedImage}
+    />
+  };
 
   displayDetailComponent(componentItem) {
     if(componentItem.type === 'ARTICLE') {
@@ -113,7 +171,7 @@ HomeFeedItemScreen.navigationOptions = ({ navigation }) => {
   };
 };
 
-const styles = StyleSheet.create({
+const styles = EStyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -128,13 +186,6 @@ const styles = StyleSheet.create({
     height: 280
   },
   feedItemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderBottomColor: 'lightgray',
-    borderBottomWidth: 1,
-  },
-  feedHeadlineImageHeader: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -161,5 +212,23 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingBottom: 10,
     marginBottom:5
+  },
+  feedItemContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    width: '100%',
+  },
+  feedItem: {
+    borderBottomColor: 'lightgray',
+    borderBottomWidth: 1,
+    marginBottom:5
+  },
+  'feedItem:last-child': {
+    borderBottomWidth: 0,
+    marginBottom:0
+  },
+  feedImage: {
+    width: '100%',
+    height: 300
   },
 });

@@ -19,6 +19,7 @@ const config = Platform.select({
 
 const HomeFeedStack = createStackNavigator(
   {
+
     HomeFeed: {
       screen: HomeFeedScreen,
       path: 'home-feed',
